@@ -188,6 +188,9 @@
 				if (func == 'origin') {
 					this[func].apply(this, $.isArray(funcs[func]) ? funcs[func] : [funcs[func]]);
 				} else if ($.inArray(func, $.transform.funcs) !== -1) {
+					//Skew is removed ###############
+					if (func == "skew" && console) console.warn("skew has been removed from W3C so it may not work!");
+					//###############################
 					values.push(this.createTransformFunc(func, funcs[func]));
 				}
 			}
@@ -228,7 +231,7 @@
 					
 					if ($.cssAngle[func]) {
 						// normalize on degrees
-						args = $.map(args, $.angle.toDegree);						
+						args = $.map(args, $.angle.toDegree);
 					} else if (!$.cssNumber[func]) {
 						// normalize to pixels
 						args = $.map(args, normalPixels);
