@@ -311,14 +311,14 @@
 			switch (x) {
 				case 'left': x = '0'; break;
 				case 'right': x = '100%'; break;
-				case 'center': // no break
-				case undefined: x = '50%';
+				case 'center': x = '50%'; break;
+				default: x = (rfxnum.test(x) ? x : '50%');
 			}
 			switch (y) {
 				case 'top': y = '0'; break;
 				case 'bottom': y = '100%'; break;
-				case 'center': // no break
-				case undefined: y = '50%'; //TODO: does this work?
+				case 'center': y = '50%'; break;
+				default: y = (rfxnum.test(y) ? y : '50%');
 			}
 			
 			// store mixed values with units, assumed pixels
