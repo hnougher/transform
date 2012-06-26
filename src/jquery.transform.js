@@ -217,8 +217,7 @@
 				return toPx(elem, val);
 			}
 			
-			var rtranslate = /translate[X|Y]?/,
-				trans = [];
+			var rtranslate = /translate[X|Y]?/;
 				
 			for (var func in funcs) {
 				switch ($.type(funcs[func])) {
@@ -241,12 +240,7 @@
 					}
 					
 					tempMatrix = $.matrix[func].apply(this, args);
-					if (rtranslate.test(func)) {
-						//defer translation
-						trans.push(tempMatrix);
-					} else {
-						matrix = matrix ? matrix.x(tempMatrix) : tempMatrix;
-					}
+					matrix = matrix ? matrix.x(tempMatrix) : tempMatrix;
 				} else if (func == 'origin') {
 					this[func].apply(this, args);
 				}
@@ -254,9 +248,6 @@
 			
 			// check that we have a matrix
 			matrix = matrix || $.matrix.identity();
-			
-			// Apply translation
-			$.each(trans, function(i, val) { matrix = matrix.x(val); });
 
 			// pull out the relevant values
 			var a = parseFloat(matrix.e(1,1).toFixed(6)),
