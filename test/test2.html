@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en" class="no-js">
+<head>
+	<meta charset="utf-8">
+
+	<!-- Always force latest IE rendering engine (even in intranet) & Chrome Frame -->
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+	<style type="text/css">
+	.box {
+		border: 1px solid #000;
+		display: inline-block;
+		height: 150px;
+		overflow: visible;
+		width: 150px;
+	}
+	.box div {
+		height: 150px;
+		outline: 1px solid #F00;
+		width: 150px;
+	}
+	</style>
+
+</head>
+<body>
+
+<div id="testSpace"><div class="box"><div><img src="i/elephant.png" height="150" width="150"></div></div></div>
+
+
+<!-- JavaScrpt -->
+<!--script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4/jquery.js"></script-->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.js"></script>
+<!-- script src="../dist/jquery.transform.js"></script -->
+<script src="../src/jquery.transform.js"></script>
+<script src="../src/jquery.transform.attributes.js"></script>
+<script src="../src/jquery.transform.animate.js"></script>
+<script src="../src/jquery.angle.js"></script>
+<script src="../src/jquery.matrix.js"></script>
+<script src="../src/jquery.matrix.calculations.js"></script>
+<script src="../src/jquery.matrix.functions.js"></script>
+<script>
+$(function () {
+	
+	var original = $("#testSpace > div").eq(0);
+	var tests = [{}
+		/*, {rotate: "45deg"}
+		, {rotate: "90deg"}
+		, {rotate: "120deg"}
+		, {rotate: "180deg"}
+		, {rotate: "270deg"}
+		
+		, {skewX: "20deg"}
+		, {skewY: "20deg"}
+		, {skew: ["20deg","20deg"]}
+		, {skewX: "-20deg"}
+		, {skewY: "-20deg"}
+		, {origin: ["-75px","-75px"], skewY: "-20deg"}
+		, {skew: ["-20deg","-20deg"]}
+		
+		, {scaleX: 1.5}
+		, {scaleY: 1.5}
+		, {scale: [1.5,1.5]}
+		, {scaleX: 0.5}
+		, {scaleY: 0.5}
+		, {origin: ["75px","75px"], scale: [0.5,0.5]}
+		
+		, {translateX: "40px"}
+		, {translateY: "40px"}
+		, {translate: ["40px","40px"]}
+		, {translateX: "-40px"}
+		, {translateY: "-40px"}
+		, {translate: ["-40px","-40px"]}*/
+		
+		, {skewY: "-20deg"}
+		, {scale: [0.5,0.5]}
+		, {rotate: "20deg"}
+		, {rotate: "20deg", translate: ["75px","75px"]}
+		, {translate: ["75px","75px"], rotate: "20deg"}
+		, {translate: ["75px","75px"], rotate: "90deg", scale: [0.5,0.5], skewY: "-20deg"}
+	];
+	
+	for (var i = 1; i < tests.length; i++) {
+		var tc = original.clone();
+		$("#testSpace").append(tc);
+		tc.children().transform(tests[i]);
+		
+		var tc = original.clone();
+		$("#testSpace").append(tc);
+		tc.children().transform(tests[i], {forceMatrix:true});
+	}
+	
+});
+</script>
+
+</body>
+</html>
