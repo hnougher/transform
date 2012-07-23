@@ -19,10 +19,6 @@
 		rfxnum = /^([\+\-]=)?([\d+.\-]+)(.*)$/,
 		rperc = /%/;
 	
-	// Steal some code from Modernizr
-	var m = document.createElement( 'modernizr' ),
-		m_style = m.style;
-		
 	function stripUnits(arg) {
 		return parseFloat(arg);
 	}
@@ -32,40 +28,29 @@
 	 */	
 	function getVendorPrefix() {
 		var property = {
-			transformProperty : '',
+			transform : '',
 			MozTransform : '-moz-',
 			WebkitTransform : '-webkit-',
 			OTransform : '-o-',
 			msTransform : '-ms-'
 		};
+		var style = document.documentElement.style;
 		for (var p in property) {
-			if (typeof m_style[p] != 'undefined') {
+			if (p in style) {
 				return property[p];
 			}
 		}
 		return null;
 	}
 	
-	function supportCssTransforms() {
-		if (typeof(window.Modernizr) !== 'undefined') {
-			return Modernizr.csstransforms;
-		}
-		
-		var props = [ 'transformProperty', 'WebkitTransform', 'MozTransform', 'OTransform', 'msTransform' ];
-		for ( var i in props ) {
-			if ( m_style[ props[i] ] !== undefined  ) {
-				return true;
-			}
-		}
-	}
-		
 	// Capture some basic properties
 	var vendorPrefix			= getVendorPrefix(),
 		transformProperty		= vendorPrefix !== null ? vendorPrefix + 'transform' : false,
 		transformOriginProperty	= vendorPrefix !== null ? vendorPrefix + 'transform-origin' : false;
 	
 	// store support in the jQuery Support object
-	$.support.csstransforms = supportCssTransforms();
+	$.support.csstransforms = (typeof(window.Modernizr) !== 'undefined'
+		? Modernizr.csstransforms : vendorPrefix != null);
 	
 	// IE9 public preview 6 requires the DOM names
 	if (vendorPrefix == '-ms-') {
@@ -262,7 +247,7 @@
 				// -moz-
 				this.$elem.css(transformProperty, 'matrix(' + a + ', ' + b + ', ' + c + ', ' + d + ', ' + tx + 'px, ' + ty + 'px)');
 			} else if ($.support.csstransforms) {
-				// -webkit, -o-, w3c
+				// -webkit, -o-, w3c, firefox 16+
 				// NOTE: WebKit and Opera don't allow units on the translate variables
 				this.$elem.css(transformProperty, 'matrix(' + a + ', ' + b + ', ' + c + ', ' + d + ', ' + tx + ', ' + ty + ')');
 			} else if ($.browser.msie) {
