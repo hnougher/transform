@@ -1,12 +1,12 @@
 /*!
- * jQuery 2d Transform v0.9.3
+ * jQuery 2d Transform v0.9.4
  * http://wiki.github.com/heygrady/transform/
  *
  * Copyright 2010, Grady Kuhnline
  * Dual licensed under the MIT or GPL Version 2 licenses.
  * http://jquery.org/license
  * 
- * Date: Sat Dec 4 15:46:09 2010 -0800
+ * Date: Mon Jul 23 11:23:53 2012 +1000
  */
 ///////////////////////////////////////////////////////
 // Transform
@@ -19,10 +19,6 @@
 		rfxnum = /^([\+\-]=)?([\d+.\-]+)(.*)$/,
 		rperc = /%/;
 	
-	// Steal some code from Modernizr
-	var m = document.createElement( 'modernizr' ),
-		m_style = m.style;
-		
 	function stripUnits(arg) {
 		return parseFloat(arg);
 	}
@@ -32,40 +28,29 @@
 	 */	
 	function getVendorPrefix() {
 		var property = {
-			transformProperty : '',
+			transform : '',
 			MozTransform : '-moz-',
 			WebkitTransform : '-webkit-',
 			OTransform : '-o-',
 			msTransform : '-ms-'
 		};
+		var style = document.documentElement.style;
 		for (var p in property) {
-			if (typeof m_style[p] != 'undefined') {
+			if (p in style) {
 				return property[p];
 			}
 		}
 		return null;
 	}
 	
-	function supportCssTransforms() {
-		if (typeof(window.Modernizr) !== 'undefined') {
-			return Modernizr.csstransforms;
-		}
-		
-		var props = [ 'transformProperty', 'WebkitTransform', 'MozTransform', 'OTransform', 'msTransform' ];
-		for ( var i in props ) {
-			if ( m_style[ props[i] ] !== undefined  ) {
-				return true;
-			}
-		}
-	}
-		
 	// Capture some basic properties
 	var vendorPrefix			= getVendorPrefix(),
 		transformProperty		= vendorPrefix !== null ? vendorPrefix + 'transform' : false,
 		transformOriginProperty	= vendorPrefix !== null ? vendorPrefix + 'transform-origin' : false;
 	
 	// store support in the jQuery Support object
-	$.support.csstransforms = supportCssTransforms();
+	$.support.csstransforms = (typeof(window.Modernizr) !== 'undefined'
+		? Modernizr.csstransforms : vendorPrefix != null);
 	
 	// IE9 public preview 6 requires the DOM names
 	if (vendorPrefix == '-ms-') {
@@ -188,6 +173,9 @@
 				if (func == 'origin') {
 					this[func].apply(this, $.isArray(funcs[func]) ? funcs[func] : [funcs[func]]);
 				} else if ($.inArray(func, $.transform.funcs) !== -1) {
+					//Skew is removed ###############
+					if (func == "skew" && console) console.warn("skew has been removed from W3C so it may not work!");
+					//###############################
 					values.push(this.createTransformFunc(func, funcs[func]));
 				}
 			}
@@ -214,8 +202,7 @@
 				return toPx(elem, val);
 			}
 			
-			var rtranslate = /translate[X|Y]?/,
-				trans = [];
+			var rtranslate = /translate[X|Y]?/;
 				
 			for (var func in funcs) {
 				switch ($.type(funcs[func])) {
@@ -228,7 +215,7 @@
 					
 					if ($.cssAngle[func]) {
 						// normalize on degrees
-						args = $.map(args, $.angle.toDegree);						
+						args = $.map(args, $.angle.toDegree);
 					} else if (!$.cssNumber[func]) {
 						// normalize to pixels
 						args = $.map(args, normalPixels);
@@ -238,12 +225,7 @@
 					}
 					
 					tempMatrix = $.matrix[func].apply(this, args);
-					if (rtranslate.test(func)) {
-						//defer translation
-						trans.push(tempMatrix);
-					} else {
-						matrix = matrix ? matrix.x(tempMatrix) : tempMatrix;
-					}
+					matrix = matrix ? matrix.x(tempMatrix) : tempMatrix;
 				} else if (func == 'origin') {
 					this[func].apply(this, args);
 				}
@@ -251,9 +233,6 @@
 			
 			// check that we have a matrix
 			matrix = matrix || $.matrix.identity();
-			
-			// Apply translation
-			$.each(trans, function(i, val) { matrix = matrix.x(val); });
 
 			// pull out the relevant values
 			var a = parseFloat(matrix.e(1,1).toFixed(6)),
@@ -268,7 +247,7 @@
 				// -moz-
 				this.$elem.css(transformProperty, 'matrix(' + a + ', ' + b + ', ' + c + ', ' + d + ', ' + tx + 'px, ' + ty + 'px)');
 			} else if ($.support.csstransforms) {
-				// -webkit, -o-, w3c
+				// -webkit, -o-, w3c, firefox 16+
 				// NOTE: WebKit and Opera don't allow units on the translate variables
 				this.$elem.css(transformProperty, 'matrix(' + a + ', ' + b + ', ' + c + ', ' + d + ', ' + tx + ', ' + ty + ')');
 			} else if ($.browser.msie) {
@@ -317,14 +296,14 @@
 			switch (x) {
 				case 'left': x = '0'; break;
 				case 'right': x = '100%'; break;
-				case 'center': // no break
-				case undefined: x = '50%';
+				case 'center': x = '50%'; break;
+				default: x = (rfxnum.test(x) ? x : '50%');
 			}
 			switch (y) {
 				case 'top': y = '0'; break;
 				case 'bottom': y = '100%'; break;
-				case 'center': // no break
-				case undefined: y = '50%'; //TODO: does this work?
+				case 'center': y = '50%'; break;
+				default: y = (rfxnum.test(y) ? y : '50%');
 			}
 			
 			// store mixed values with units, assumed pixels
